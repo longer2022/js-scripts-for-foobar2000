@@ -1,6 +1,7 @@
 import { onMouseLbtnDown, onPaint, onSize } from "src/common/callbacks";
 import { randomColor } from "src/common/helpers";
 import { Panel, Rect, Splitter, SplitterItem, WindowPanel } from "src/common/panel_splitter";
+import { AutoLayout } from "node_modules/@lume/autolayout/dist/AutoLayout";
 
 export function fillRect(gr: GdiGraphics, bounds: Rect, color: number) {
 	gr.FillSolidRect(bounds.x, bounds.y, bounds.width, bounds.height, color);
@@ -95,3 +96,5 @@ onMouseLbtnDown.event((event) => {
 console.log("------------------ layout ----------------")
 printLayout(_test_panel, 0);
 console.log("------------------------------------------")
+
+
