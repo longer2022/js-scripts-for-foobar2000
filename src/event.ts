@@ -3,46 +3,42 @@
  *
  */
 
-function EventDispatcher()
-{
+class EventDispatcher {
 	/** hash table for listeners ... Key (Event type) : Array of functions */
-	this.lsrs = {};
-	this.cals = {}; // hash table for objects   ... Key (Event type) : Array of Objects, on which function should be called
-}
+	private lsrs = {};
+	/** hash table for objects   ... Key (Event type) : Array of Objects, on
+	 * which function should be called */
+	private cals = {}; 
 
-EventDispatcher.efbc = [];	// objects, on which EnterFrame will be broadcasted
+	/** objects, on which EnterFrame will be broadcasted */
+	static efbc = [];
 
-EventDispatcher.prototype.hasEventListener = function(type)
-{
-	var fs = this.lsrs[type];		// functions for this event
-	if (fs == null) return false;
-	return (fs.length > 0);
-}
-
-EventDispatcher.prototype.addEventListener = function(type, f)
-{
-	this.addEventListener2(type, f, null);
-}
-
-EventDispatcher.prototype.addEventListener2 = function(type, f, o)	// string, function
-{
-	if(this.lsrs[type] == null)
-	{
-		this.lsrs[type] = [];
-		this.cals[type] = [];
+	hasEventListener (type) {
+		let fs = this.lsrs[type];		// functions for this event
+		if (fs == null) return false;
+		return (fs.length > 0);
 	}
-	this.lsrs[type].push(f);
-	this.cals[type].push(o);
 
-	if(type == Event.ENTER_FRAME)
-	{
-		var arEF = EventDispatcher.efbc;
-		if(arEF.indexOf(this) < 0) arEF.push(this);
+	addEventListener (type, f) {
+		this.addEventListener2(type, f, null);
 	}
-}
 
-EventDispatcher.prototype.removeEventListener = function(type, f)	// string, function
-{
+	addEventListener2 (type, f, o)	{// string, function 
+		if(this.lsrs[type] == null)
+			{
+				this.lsrs[type] = [];
+				this.cals[type] = [];
+			}
+			this.lsrs[type].push(f);
+			this.cals[type].push(o);
+
+			if(type == Event.ENTER_FRAME)
+				{
+					var arEF = EventDispatcher.efbc;
+					if(arEF.indexOf(this) < 0) arEF.push(this);
+				}
+	}
+removeEventListener(type, f){	// string, function
 	var fs = this.lsrs[type];		// functions for this event
 	if (fs == null) return;
 	var ind = fs.indexOf(f);
@@ -58,8 +54,8 @@ EventDispatcher.prototype.removeEventListener = function(type, f)	// string, fun
 	}
 }
 
-EventDispatcher.prototype.dispatchEvent = function(e)	// Event
-{
+dispatchEvent(e){
+	// Event
 	e.currentTarget = this;
 	if(e.target == null) e.target = this;
 
@@ -72,6 +68,16 @@ EventDispatcher.prototype.dispatchEvent = function(e)	// Event
 		else fs[i].call(cs[i], e);
 	}
 }
+
+
+}
+
+
+
+
+
+
+
 
 function Event(type, bubbles)
 {
