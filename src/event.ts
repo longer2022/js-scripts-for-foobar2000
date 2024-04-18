@@ -5,69 +5,66 @@
 
 class EventDispatcher {
 	/** hash table for listeners ... Key (Event type) : Array of functions */
-	private lsrs = {};
+	private lsrs: { [key: string]: Function[] } = {};
 	/** hash table for objects   ... Key (Event type) : Array of Objects, on
 	 * which function should be called */
-	private cals = {}; 
+	private cals: { [key: string]: Object[] } = {};
 
 	/** objects, on which EnterFrame will be broadcasted */
-	static efbc = [];
+	static efbc: Object[] = [];
 
-	hasEventListener (type) {
+	hasEventListener(type: string) {
 		let fs = this.lsrs[type];		// functions for this event
 		if (fs == null) return false;
 		return (fs.length > 0);
 	}
 
-	addEventListener (type, f) {
+	addEventListener(type: string, f: Function) {
 		this.addEventListener2(type, f, null);
 	}
 
-	addEventListener2 (type, f, o)	{// string, function 
-		if(this.lsrs[type] == null)
-			{
-				this.lsrs[type] = [];
-				this.cals[type] = [];
-			}
-			this.lsrs[type].push(f);
-			this.cals[type].push(o);
+	addEventListener2(type: string, f: Function, o: Object) {// string, function
+		if (this.lsrs[type] == null) {
+			this.lsrs[type] = [];
+			this.cals[type] = [];
+		}
+		this.lsrs[type].push(f);
+		this.cals[type].push(o);
 
-			if(type == Event.ENTER_FRAME)
-				{
-					var arEF = EventDispatcher.efbc;
-					if(arEF.indexOf(this) < 0) arEF.push(this);
-				}
+		if (type == FbEvent.ENTER_FRAME) {
+			var arEF = EventDispatcher.efbc;
+			if (arEF.indexOf(this) < 0) arEF.push(this);
+		}
 	}
-removeEventListener(type, f){	// string, function
-	var fs = this.lsrs[type];		// functions for this event
-	if (fs == null) return;
-	var ind = fs.indexOf(f);
-	if(ind < 0) return;
-	var cs = this.cals[type];
-	fs.splice(ind, 1);
-	cs.splice(ind, 1);
 
-	if(type == Event.ENTER_FRAME && fs.length == 0)
-	{
-		var arEF = EventDispatcher.efbc;
-		arEF.splice(arEF.indexOf(this), 1);
+	removeEventListener(type: string, f: Function) {	// string, function
+		var fs = this.lsrs[type];		// functions for this event
+		if (fs == null) return;
+		var ind = fs.indexOf(f);
+		if (ind < 0) return;
+		var cs = this.cals[type];
+		fs.splice(ind, 1);
+		cs.splice(ind, 1);
+
+		if (type == FbEvent.ENTER_FRAME && fs.length == 0) {
+			var arEF = EventDispatcher.efbc;
+			arEF.splice(arEF.indexOf(this), 1);
+		}
 	}
-}
 
-dispatchEvent(e){
-	// Event
-	e.currentTarget = this;
-	if(e.target == null) e.target = this;
+	dispatchEvent(e: FbEvent) {
+		// Event
+		e.currentTarget = this;
+		if (e.target == null) e.target = this;
 
-	var fs = this.lsrs[e.type];
-	if (fs == null) return;
-	var cs = this.cals[e.type];
-	for (var i=0; i<fs.length; i++)
-	{
-		if(cs[i] == null) fs[i](e);
-		else fs[i].call(cs[i], e);
+		var fs = this.lsrs[e.type];
+		if (fs == null) return;
+		var cs = this.cals[e.type];
+		for (var i = 0; i < fs.length; i++) {
+			if (cs[i] == null) fs[i](e);
+			else fs[i].call(cs[i], e);
+		}
 	}
-}
 
 
 }
@@ -79,51 +76,65 @@ dispatchEvent(e){
 
 
 
-function Event(type, bubbles)
-{
-	if(!bubbles) bubbles= false;
-	this.type			= type;
-	this.target			= null;
-	this.currentTarget	= null;
-	this.bubbles		= bubbles;
+class FbEvent {
+
+	type: string;
+	target: Object;
+	currentTarget: Object;
+	bubbles: boolean = false;
+
+
+	static ENTER_FRAME = "enterFrame";
+	static RESIZE = "resize";
+	static ADDED_TO_STAGE = "addedToStage";
+	static REMOVED_FROM_STAGE = "removedFromStage";
+
+	static CHANGE = "change";
+
+	static OPEN = "open";
+	static PROGRESS = "progress";
+	static COMPLETE = "complete";//	package net.ivank.events;
+
+	constructor(type: string, bubbles: boolean = false) {
+		if (!bubbles) bubbles = false;
+		this.type = type;
+		this.target = null;
+		this.currentTarget = null;
+		this.bubbles = bubbles;
+	}
+
+
 }
 
-Event.ENTER_FRAME			= "enterFrame";
-Event.RESIZE				= "resize";
-Event.ADDED_TO_STAGE 		= "addedToStage";
-Event.REMOVED_FROM_STAGE 	= "removedFromStage";
 
-Event.CHANGE				= "change";
+class FbMouseEvent extends FbEvent {
 
-Event.OPEN					= "open";
-Event.PROGRESS				= "progress";
-Event.COMPLETE				= "complete";//	package net.ivank.events;
+	movementX = 0;
+	movementY = 0;
 
-function MouseEvent(type, bubbles)
-{
-	Event.call(this, type, bubbles);
+	static CLICK = "click";
+	static MOUSE_DOWN = "mouseDown";
+	static MOUSE_UP = "mouseUp";
 
-	this.movementX = 0;
-	this.movementY = 0;
+	static MIDDLE_CLICK = "middleClick";
+	static MIDDLE_MOUSE_DOWN = "middleMouseDown";
+	static MIDDLE_MOUSE_UP = "middleMouseUp";
+
+	static RIGHT_CLICK = "rightClick";
+	static RIGHT_MOUSE_DOWN = "rightMouseDown";
+	static RIGHT_MOUSE_UP = "rightMouseUp";
+
+	static MOUSE_MOVE = "mouseMove";
+	static MOUSE_OVER = "mouseOver";
+	static MOUSE_OUT = "mouseOut";//	package net.ivank.events;
+
+	constructor(type: string, bubbles: boolean = false) {
+		super(type, bubbles);
+	}
+
 }
-MouseEvent.prototype = new Event();
 
 
-MouseEvent.CLICK		= "click";
-MouseEvent.MOUSE_DOWN	= "mouseDown";
-MouseEvent.MOUSE_UP		= "mouseUp";
-
-MouseEvent.MIDDLE_CLICK	= "middleClick";
-MouseEvent.MIDDLE_MOUSE_DOWN	= "middleMouseDown";
-MouseEvent.MIDDLE_MOUSE_UP		= "middleMouseUp";
-
-MouseEvent.RIGHT_CLICK	= "rightClick";
-MouseEvent.RIGHT_MOUSE_DOWN	= "rightMouseDown";
-MouseEvent.RIGHT_MOUSE_UP	= "rightMouseUp";
-
-MouseEvent.MOUSE_MOVE	= "mouseMove";
-MouseEvent.MOUSE_OVER	= "mouseOver";
-MouseEvent.MOUSE_OUT	= "mouseOut";//	package net.ivank.events;
 
 function TouchEvent(type, bubbles)
 {
