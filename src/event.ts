@@ -135,34 +135,40 @@ class FbMouseEvent extends FbEvent {
 }
 
 
+class FbTouchEvent {
 
-function TouchEvent(type, bubbles)
-{
-	Event.call(this, type, bubbles);
+	stageX = 0;
+	stageY = 0;
+	touchPointID = -1;
 
+constructor(type, bubbles) {
+	super(type, bubbles);
 	this.stageX = 0;
 	this.stageY = 0;
 	this.touchPointID = -1;
 }
-TouchEvent.prototype = new Event();
 
-TouchEvent.prototype._setFromDom = function(t)
+private _setFromDom = function(t)
 {
+	try {
 	var dpr = window.devicePixelRatio || 1;
 	this.stageX = t.clientX*dpr;
 	this.stageY = t.clientY*dpr;
 	this.touchPointID = t.identifier;
+	} catch (e) {};
 }
 
-TouchEvent.TOUCH_BEGIN  = "touchBegin";
-TouchEvent.TOUCH_END    = "touchEnd";
-TouchEvent.TOUCH_MOVE   = "touchMove";
-TouchEvent.TOUCH_OUT    = "touchOut";
-TouchEvent.TOUCH_OVER   = "touchOver";
+static TOUCH_BEGIN  = "touchBegin";
+static TOUCH_END    = "touchEnd";
+static TOUCH_MOVE   = "touchMove";
+static TOUCH_OUT    = "touchOut";
+static TOUCH_OVER   = "touchOver";
 //TouchEvent.TOUCH_ROLL_OUT = "touchRollOut";
 //TouchEvent.TOUCH_ROLL_OVER = "touchRollOver";
-TouchEvent.TOUCH_TAP = "touchTap";
+static TOUCH_TAP = "touchTap";
 //	package net.ivank.display;
+//
+}
 
 
 function KeyboardEvent(type, bubbles)
