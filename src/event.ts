@@ -3,7 +3,7 @@
  *
  */
 
-class EventDispatcher {
+export class EventDispatcher {
 	/** hash table for listeners ... Key (Event type) : Array of functions */
 	private lsrs: { [key: string]: Function[] } = {};
 	/** hash table for objects   ... Key (Event type) : Array of Objects, on
@@ -70,7 +70,7 @@ class EventDispatcher {
 }
 
 
-class FbEvent {
+export class FbEvent {
 
 	type: string;
 	target: Object;
@@ -101,7 +101,7 @@ class FbEvent {
 }
 
 
-class FbMouseEvent extends FbEvent {
+export class FbMouseEvent extends FbEvent {
 
 	movementX = 0;
 	movementY = 0;
@@ -129,7 +129,7 @@ class FbMouseEvent extends FbEvent {
 }
 
 
-class FbTouchEvent extends FbEvent {
+export class FbTouchEvent extends FbEvent {
 
 	stageX = 0;
 	stageY = 0;
@@ -165,7 +165,7 @@ static TOUCH_TAP = "touchTap";
 }
 
 
-class FbKeyboardEvent extends FbEvent {
+export class FbKeyboardEvent extends FbEvent {
 	altKey = false;
 	ctrlKey = false;
 	shiftKey = false;
