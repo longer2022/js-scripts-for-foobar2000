@@ -70,12 +70,6 @@ class EventDispatcher {
 }
 
 
-
-
-
-
-
-
 class FbEvent {
 
 	type: string;
@@ -135,27 +129,27 @@ class FbMouseEvent extends FbEvent {
 }
 
 
-class FbTouchEvent {
+class FbTouchEvent extends FbEvent {
 
 	stageX = 0;
 	stageY = 0;
 	touchPointID = -1;
 
-constructor(type, bubbles) {
+constructor(type: string, bubbles: boolean = false) {
 	super(type, bubbles);
 	this.stageX = 0;
 	this.stageY = 0;
 	this.touchPointID = -1;
 }
 
-private _setFromDom = function(t)
+private _setFromDom = function(t: Object)
 {
-	try {
-	var dpr = window.devicePixelRatio || 1;
-	this.stageX = t.clientX*dpr;
-	this.stageY = t.clientY*dpr;
-	this.touchPointID = t.identifier;
-	} catch (e) {};
+	// try {
+	// var dpr = window.devicePixelRatio || 1;
+	// this.stageX = t.clientX*dpr;
+	// this.stageY = t.clientY*dpr;
+	// this.touchPointID = t.identifier;
+	// } catch (e) {};
 }
 
 static TOUCH_BEGIN  = "touchBegin";
@@ -171,29 +165,23 @@ static TOUCH_TAP = "touchTap";
 }
 
 
-function KeyboardEvent(type, bubbles)
-{
-	Event.call(this, type, bubbles);
+class FbKeyboardEvent extends FbEvent {
+	altKey = false;
+	ctrlKey = false;
+	shiftKey = false;
+	charCode = 0;
+	keyCode = 0;
 
-	this.altKey = false;
-	this.ctrlKey = false;
-	this.shiftKey = false;
+	constructor(type: string, bubbles: boolean = false) {
+		super(type, bubbles);
+		this.altKey = false;
+		this.ctrlKey = false;
+		this.shiftKey = false;
 
-	this.keyCode = 0;
-	this.charCode = 0;
+		this.keyCode = 0;
+		this.charCode = 0;
+	}
+
+	static KEY_DOWN = "keyDown";
+	static KEY_UP = "keyUp";
 }
-KeyboardEvent.prototype = new Event();
-
-KeyboardEvent.prototype._setFromDom = function(e)
-{
-	//console.log(e);
-	this.altKey		= e.altKey;
-	this.ctrlKey	= e.ctrlKey;
-	this.shiftKey	= e.shiftKey;
-
-	this.keyCode	= e.keyCode;
-	this.charCode	= e.charCode;
-}
-
-KeyboardEvent.KEY_DOWN	= "keyDown";
-KeyboardEvent.KEY_UP	= "keyUp";
