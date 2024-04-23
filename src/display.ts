@@ -61,7 +61,7 @@ this.transform = new Transform();
 	}
 
 
-dispatchEvent  (e) {
+dispatchEvent  (e: FbEvent	) {
 	// : returns the deepest active InteractiveObject of subtree
 	EventDispatcher.prototype.dispatchEvent.call(this, e);
 	if (e.bubbles && this.parent != null) this.parent.dispatchEvent(e);
