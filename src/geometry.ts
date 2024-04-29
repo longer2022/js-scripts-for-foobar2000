@@ -3,6 +3,9 @@
  * orign by Ivan Kuclir
  */
 
+import { DisplayObject } from "./display";
+
+
 /**
  * A class for representing a 2D point
  */
@@ -10,7 +13,7 @@
 /**
  * @constructor
  */
-class Point {
+export class Point {
 	x: number;
 	y: number;
 
@@ -58,21 +61,39 @@ class Point {
 		return new Point(this.x - p.x, this.y - p.y);
 	}
 
-	static distance(a, b) {
+	static distance(a: Point, b: Point) {
 		return Point._distance(a.x, a.y, b.x, b.y);
 	}
-	static interpolate(a, b, f) {
+	static interpolate(a: Point, b: Point, f: number) {
 		return new Point(a.x + f * (b.x - a.x), a.y + f * (b.y - a.y));
 	}
-	static polar(len, ang) {
+	static polar(len: number, ang: number) {
 		return new Point(len * Math.cos(ang), len * Math.sin(ang));
 	}
-	static _distance(x1, y1, x2, y2) {
+	static _distance(x1: number, y1: number, x2: number, y2: number) {
 		return Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
 	}
 
-	static _v4: any = {};
-	static _m4: any = {};
+	static _v4: V4;
+	static _m4: M4;
+}
+
+interface V4 {
+	create(): Float32Array
+	add(a: Float32Array, b: Float32Array, out: Float32Array): void
+	set (a: number[], out: Float32Array): void
+}
+
+interface M4 {
+	create(mat?: number[]): Float32Array
+	create(mat?:Float32Array): Float32Array
+	add(a: Float32Array, b: Float32Array, out: Float32Array): void
+	set (a: number[], out: Float32Array): void
+	multiply(a: Float32Array, b: Float32Array, out: Float32Array): Float32Array
+	multiplyVec2(m: Float32Array, v: Float32Array, out: Float32Array): void;
+	multiplyVec4(m: Float32Array, v: Float32Array, out: Float32Array): void;
+	inverse(a: Float32Array, out: Float32Array): Float32Array
+
 }
 
 Point._v4.create = function () {
@@ -80,28 +101,28 @@ Point._v4.create = function () {
 	return out;
 };
 
-Point._m4.create = function (mat) {
+Point._m4.create = function (mat?: number[]) {
 	var d = new Float32Array(16);
 	d[0] = d[5] = d[10] = d[15] = 1.0;
 	if (mat) Point._m4.set(mat, d);
 	return d;
 };
 
-Point._v4.add = function (a, b, out) {
+Point._v4.add = function (a: Float32Array, b: Float32Array, out: Float32Array) {
 	out[0] = a[0] + b[0];
 	out[1] = a[1] + b[1];
 	out[2] = a[2] + b[2];
 	out[3] = a[3] + b[3];
 };
 
-Point._v4.set = function (a, out) {
+Point._v4.set = function (a: number[], out: Float32Array) {
 	out[0] = a[0];
 	out[1] = a[1];
 	out[2] = a[2];
 	out[3] = a[3];
 };
 
-Point._m4.set = function (m, d) {
+Point._m4.set = function (m: number[], d: Float32Array) {
 	d[0] = m[0];
 	d[1] = m[1];
 	d[2] = m[2];
@@ -120,7 +141,7 @@ Point._m4.set = function (m, d) {
 	d[15] = m[15];
 };
 
-Point._m4.multiply = function (a, b, out) {
+Point._m4.multiply = function (a: Float32Array, b: Float32Array, out: Float32Array) {
 	var a00 = a[0],
 		a01 = a[1],
 		a02 = a[2],
@@ -177,7 +198,7 @@ Point._m4.multiply = function (a, b, out) {
 	return out;
 };
 
-Point._m4.inverse = function (a, out) {
+Point._m4.inverse = function (a: Float32Array, out: Float32Array) {
 	var a00 = a[0],
 		a01 = a[1],
 		a02 = a[2],
@@ -234,14 +255,14 @@ Point._m4.inverse = function (a, out) {
 	return out;
 };
 
-Point._m4.multiplyVec2 = function (m, vec, dest) {
+Point._m4.multiplyVec2 = function (m:Float32Array, vec: Float32Array, dest: Float32Array) {
 	var x = vec[0],
 		y = vec[1];
 	dest[0] = x * m[0] + y * m[4] + m[12];
 	dest[1] = x * m[1] + y * m[5] + m[13];
 };
 
-Point._m4.multiplyVec4 = function (m, v, out) {
+Point._m4.multiplyVec4 = function (m: Float32Array, v: Float32Array, out: Float32Array) {
 	var v0 = v[0],
 		v1 = v[1],
 		v2 = v[2],
@@ -252,6 +273,7 @@ Point._m4.multiplyVec4 = function (m, v, out) {
 	out[2] = m[2] * v0 + m[6] * v1 + m[10] * v2 + m[14] * v3;
 	out[3] = m[3] * v0 + m[7] * v1 + m[11] * v2 + m[15] * v3;
 };
+
 //package net.ivank.geom;
 
 /**
@@ -260,7 +282,7 @@ Point._m4.multiplyVec4 = function (m, v, out) {
  *
  */
 
-class Rectangle {
+export class Rectangle {
 	x: number;
 	y: number;
 	width: number;
@@ -425,8 +447,8 @@ class Rectangle {
  * A class for representing a 2D point
  * @author Ivan Kuckir
  */
-class Transform {
-	_obj = null;
+export class Transform {
+	_obj :DisplayObject
 
 	_mdirty = false; // matrix dirty
 	_vdirty = false; // values dirty
@@ -463,7 +485,7 @@ class Transform {
 		return this._imat;
 	}
 
-	_postScale(sx, sy) {
+	_postScale(sx: number, sy: number) {
 		this._checkMat();
 		var ps = this._pscal;
 		ps[10] = ps[15] = 1;
@@ -552,7 +574,7 @@ class Transform {
 		}
 	};
 
-	_setOPos(m) {
+	_setOPos() {
 		var m = this._tmat;
 		this._obj.x = m[12];
 		this._obj.y = m[13];
